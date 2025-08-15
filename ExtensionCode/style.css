@@ -2,49 +2,55 @@
   position: fixed;
   top: 80px;
   right: 20px;
-  background: #fdfdfd;
-  border: 1px solid #ccc;
+  background: #fff;
+  border: 1px solid #ddd;
   font-family: Arial, sans-serif;
   padding: 10px;
-  width: 220px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 240px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   z-index: 999999;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 #indiabix-dashboard .dash-header {
   background: #1976d2;
   color: white;
-  padding: 5px;
+  padding: 6px;
   font-weight: bold;
   text-align: center;
   border-radius: 4px;
-}
-
-#indiabix-dashboard .dash-timer {
-  margin-top: 8px;
-  font-size: 18px;
-  text-align: center;
+  font-size: 14px;
 }
 
 #indiabix-dashboard .dash-controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
   margin-top: 8px;
+}
+
+#indiabix-dashboard #time-display {
+  font-size: 18px;
+  font-weight: bold;
 }
 
 #indiabix-dashboard button {
   background: #f57c00;
   color: white;
   border: none;
-  padding: 4px 8px;
+  padding: 6px 8px;
   cursor: pointer;
   border-radius: 4px;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 #indiabix-dashboard button:hover {
   background: #ef6c00;
+}
+
+#indiabix-dashboard .dash-report {
+  margin-top: 10px;
+  text-align: center;
 }
 
 #indiabix-dashboard .dash-stats {

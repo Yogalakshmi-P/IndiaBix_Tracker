@@ -6,7 +6,7 @@
     document.querySelector("h1")?.innerText.trim() || "Unknown Topic";
 
   let stats = {
-    [topicName]: { total: 0, correct: 0, attempts: 0 },
+    [topicName]: { correct: 0, wrong: 0 },
   };
 
   function createDashboard() {
@@ -14,37 +14,47 @@
     dash.id = "indiabix-dashboard";
     dash.innerHTML = `
             <div class="dash-header">${topicName} - Tracker</div>
-            <div class="dash-timer">⏱ <span id="time-display">00:00</span></div>
             <div class="dash-controls">
-                <button id="start-btn">Start</button>
-                <button id="stop-btn">Stop</button>
-                <button id="reset-btn">Reset</button>
+                <button id="start-stop-btn" title="Start">▶</button>
+                <span id="time-display">00:00</span>
+                <button id="reset-btn" title="Reset">🔄</button>
             </div>
-            <div class="dash-stats">Attempts: <span id="attempts-count">0</span> | Correct: <span id="correct-count">0</span></div>
+            <div class="dash-report">
+                <button id="report-btn" title="Show Report">📊 Report</button>
+            </div>
+            <div class="dash-stats">
+                ✅ Correct: <span id="correct-count">0</span> | ❌ Wrong: <span id="wrong-count">0</span>
+            </div>
         `;
     document.body.appendChild(dash);
 
-    document.getElementById("start-btn").onclick = startTimer;
-    document.getElementById("stop-btn").onclick = stopTimer;
+    document.getElementById("start-stop-btn").onclick = toggleTimer;
     document.getElementById("reset-btn").onclick = resetTimer;
+    document.getElementById("report-btn").onclick = () => showReport(topicName);
   }
 
-  function startTimer() {
+  function toggleTimer() {
+    const btn = document.getElementById("start-stop-btn");
     if (!timerInterval) {
       startTime = Date.now() - elapsed;
       timerInterval = setInterval(updateTimer, 1000);
+      btn.textContent = "⏸";
+      btn.title = "Stop";
+    } else {
+      clearInterval(timerInterval);
+      timerInterval = null;
+      btn.textContent = "▶";
+      btn.title = "Start";
     }
   }
 
-  function stopTimer() {
+  function resetTimer() {
     clearInterval(timerInterval);
     timerInterval = null;
-  }
-
-  function resetTimer() {
-    stopTimer();
     elapsed = 0;
     updateTimerDisplay(0);
+    document.getElementById("start-stop-btn").textContent = "▶";
+    document.getElementById("start-stop-btn").title = "Start";
   }
 
   function updateTimer() {
@@ -59,58 +69,60 @@
     document.getElementById("time-display").innerText = `${minutes}:${seconds}`;
   }
 
-  function trackAttempts() {
+  function trackAnswers() {
     document.body.addEventListener("click", (e) => {
       const optionCell = e.target.closest(".bix-td-option");
       if (optionCell) {
-        const questionId = optionCell.id.split("_").pop(); // e.g., "239"
-
-        // Count attempt
-        stats[topicName].attempts++;
-        document.getElementById("attempts-count").innerText =
-          stats[topicName].attempts;
-
-        // Check correctness (IndiaBix marks correct answer with an image named 'correct.gif')
-        if (optionCell.innerHTML.includes("correct.gif")) {
-          stats[topicName].correct++;
-          document.getElementById("correct-count").innerText =
-            stats[topicName].correct;
-        }
+        // Wait a moment for DOM to update after click
+        setTimeout(() => {
+          const answerSection = optionCell.closest("table")?.nextElementSibling;
+          if (
+            answerSection &&
+            answerSection.innerText.toLowerCase().includes("correct answer")
+          ) {
+            stats[topicName].correct++;
+            document.getElementById("correct-count").innerText =
+              stats[topicName].correct;
+          } else {
+            stats[topicName].wrong++;
+            document.getElementById("wrong-count").innerText =
+              stats[topicName].wrong;
+          }
+        }, 200); // small delay so IndiaBix updates DOM
       }
     });
+  }
+
+  function showReport(topic) {
+    let data = stats[topic];
+    let total = data.correct + data.wrong;
+    let efficiency = total > 0 ? ((data.correct / total) * 100).toFixed(1) : 0;
+    alert(
+      `Report for ${topic}:\n✅ Correct: ${data.correct}\n❌ Wrong: ${data.wrong}\nEfficiency: ${efficiency}%`
+    );
   }
 
   function detectTopicChange() {
     const observer = new MutationObserver(() => {
       let newTopic = document.querySelector("h1")?.innerText.trim();
       if (newTopic && newTopic !== topicName) {
-        showReport(topicName);
         topicName = newTopic;
         if (!stats[topicName]) {
-          stats[topicName] = { total: 0, correct: 0, attempts: 0 };
+          stats[topicName] = { correct: 0, wrong: 0 };
         }
         document.querySelector(
           ".dash-header"
         ).innerText = `${topicName} - Tracker`;
-        document.getElementById("attempts-count").innerText =
-          stats[topicName].attempts;
         document.getElementById("correct-count").innerText =
           stats[topicName].correct;
+        document.getElementById("wrong-count").innerText =
+          stats[topicName].wrong;
       }
     });
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
-  function showReport(oldTopic) {
-    let data = stats[oldTopic];
-    let efficiency =
-      data.attempts > 0 ? ((data.correct / data.attempts) * 100).toFixed(1) : 0;
-    alert(
-      `Report for ${oldTopic}:\nCorrect: ${data.correct}\nAttempts: ${data.attempts}\nEfficiency: ${efficiency}%`
-    );
-  }
-
   createDashboard();
-  trackAttempts();
+  trackAnswers();
   detectTopicChange();
 })();
