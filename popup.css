@@ -1,0 +1,15 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 10px;
+  min-width: 200px;
+  background: #f9f9f9;
+}
+
+h1 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+#stats p {
+  margin: 5px 0;
+}

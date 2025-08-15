@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "IndianBix Tracker",
+  "version": "1.0",
+  "description": "Track your aptitude solving time and performance on IndianBix.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "content_scripts": [
+    {
+      "matches": ["*://www.indiabix.com/*"],
+      "js": ["content.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "icons": {
+    "128": "icon.png"
+  }
+}
